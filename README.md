@@ -1,47 +1,64 @@
-# Zap — start a WhatsApp message from the Rokid Glasses
+# Zap — WhatsApp on Rokid Glasses
 
 [🇬🇧 English](#en--english) | [🇧🇷 Português](#pt--português)
 
+Download and install guide: **[z.alema.io](https://z.alema.io)**
+
 ## EN — English
 
-A Rokid Nexus plugin (phone-side, no glasses code, no server). Relay answers notifications; Zap does what Relay cannot: **start a conversation with anyone**.
+Zap is a [Rokid Nexus](https://github.com/Anezium) plugin that brings your WhatsApp chats to the Rokid Glasses lens. It runs on the phone: no code on the glasses, no server, no unofficial WhatsApp client.
 
-**On the glasses:** open Zap → *Speak* → "mensagem pro Bruno: tô chegando" → review card → **Send · Listen · Say it again**. Or pick a recent person and dictate only the message. Nothing is sent before *Send*.
+**On the glasses**
+- Chat list, newest first, unread chats highlighted, short times.
+- Open a chat: read, play voice messages, read aloud, see photos.
+- Reply or start a new chat by voice. You always see the text first; nothing is sent until you tap **Send**.
+- Send photos: the one you just took with the glasses' button ("Send with Zap?"), or any from the glasses' or the phone's gallery.
+- React with an emoji, sent as a message, in your skin tone.
+- Optional AI summary when messages pile up, with one-tap actions (ready replies, calendar, reminder, Maps). Uses your own API key.
+- Skills for the Nexus Assistant ("what did I miss on WhatsApp?").
+- Portuguese and English.
 
-**Who you can write to:** people who messaged you on WhatsApp (learned from WhatsApp's notifications: name and number only, never the text), plus, optionally, the phone's address book.
+**How it works**
+- Chats come from WhatsApp's notifications and stay on the phone, encrypted with an Android Keystore key.
+- Sending opens the WhatsApp chat with the confirmed text. The optional accessibility helper then presses Send for you; it only acts inside WhatsApp, on the text you confirmed.
+- Internet is used only for the optional AI summary, straight to the provider you chose.
 
-**How it sends:** opens the WhatsApp chat with the text typed (`whatsapp://send`). With the optional accessibility helper, it presses Send by itself; it only clicks when the text box holds exactly the confirmed message, and works only inside WhatsApp. Without it, the chat stays open on the phone for your thumb.
+**Build**
 
-**Not used:** no internet permission, no unofficial WhatsApp client, no server.
+```bash
+./gradlew :core:testDebugUnitTest :app:assembleNexusRelease   # the Nexus Store package
+./gradlew :app:assembleSiteRelease                            # the package served on z.alema.io
+```
 
-| Module | What |
+JDK 17 and Android SDK 36. Release signing lives outside the repo (`~/.zap/signing.properties`).
+
+| Folder | What |
 |---|---|
-| `core/` | Pure Kotlin: contact matching by voice, the sentence parser (pt/en/es), phone numbers, links, the `ComposeFlow` state machine. 26 unit tests. |
-| `app/` | The Nexus plugin (SDK `sdk-v0.23.0`, capabilities `surfaces,stt,tts`), notification listener, send helper, settings. |
-| `upstream/` | The patch proposed to Anezium's Relay ("speak a conversation when opened"). |
-
-Build: `./gradlew :core:testDebugUnitTest :app:assembleDebug` (JDK 17, Android SDK 36).
-
-**To verify on the device:** that WhatsApp's conversation shortcut id is the WhatsApp id (`…@s.whatsapp.net`); the view ids `com.whatsapp:id/entry` and `:id/send`; that the Nexus hub grants `stt`/`tts` to a sideloaded plugin.
+| `core/` | Pure Kotlin with unit tests: the screens, the `ComposeFlow` state machine, contact matching by voice, summaries, reactions. |
+| `app/` | The Nexus plugin: notification listener, send helper, Quick Settings tile, settings. |
+| `upstream/` | A patch proposed to Anezium's Relay. |
 
 ## PT — Português
 
-Um plugin do Rokid Nexus (roda no celular, sem código nos óculos, sem servidor). O Relay responde notificações; o Zap faz o que o Relay não faz: **começar uma conversa com qualquer pessoa**.
+O Zap é um plugin do [Rokid Nexus](https://github.com/Anezium) que leva as suas conversas do WhatsApp para a lente dos Rokid Glasses. Ele roda no celular: sem código nos óculos, sem servidor, sem cliente não oficial do WhatsApp.
 
-**Nos óculos:** abre o Zap → *Falar* → "mensagem pro Bruno: tô chegando" → card de revisão → **Enviar · Ouvir · Ditar de novo**. Ou escolhe uma pessoa recente e dita só a mensagem. Nada sai antes de *Enviar*.
+**Nos óculos**
+- Lista de conversas, as mais novas em cima, não lidas em destaque, horários curtos.
+- Abra uma conversa: leia, ouça áudios, ouça em voz alta, veja fotos.
+- Responda ou comece uma conversa por voz. Você sempre vê o texto antes; nada é enviado até você tocar em **Enviar**.
+- Mande fotos: a que você acabou de tirar com o botão dos óculos ("Enviar pelo Zap?") ou qualquer uma da galeria dos óculos ou do celular.
+- Reaja com emoji, enviado como mensagem, no seu tom de pele.
+- Opcional: resumo com IA quando as mensagens acumulam, com ações em um toque (respostas prontas, agenda, lembrete, Maps). Usa a sua própria chave de API.
+- Skills para o Assistant do Nexus ("o que eu perdi no WhatsApp?").
+- Português e inglês.
 
-**Para quem dá para escrever:** quem te mandou mensagem no WhatsApp (aprendido pelas notificações do WhatsApp: só nome e número, nunca o texto) e, se você quiser, a agenda do celular.
+**Como funciona**
+- As conversas vêm das notificações do WhatsApp e ficam no celular, criptografadas com uma chave do Android Keystore.
+- Para enviar, o Zap abre a conversa do WhatsApp com o texto confirmado. O ajudante de acessibilidade (opcional) aperta Enviar por você; ele só age dentro do WhatsApp, no texto que você confirmou.
+- A internet só é usada no resumo com IA (opcional), direto com o provedor que você escolheu.
 
-**Como envia:** abre a conversa do WhatsApp com o texto digitado (`whatsapp://send`). Com o ajudante de acessibilidade (opcional), ele aperta Enviar sozinho; só clica quando a caixa de texto tem exatamente a mensagem confirmada, e só funciona dentro do WhatsApp. Sem ele, a conversa fica aberta no celular para o seu dedo.
+**Compilar:** veja os comandos acima (JDK 17, Android SDK 36). A assinatura de release fica fora do repositório.
 
-**Não usa:** permissão de internet, cliente não oficial do WhatsApp, servidor.
+---
 
-| Módulo | O quê |
-|---|---|
-| `core/` | Kotlin puro: busca de contato por voz, entendimento da frase (pt/en/es), números de telefone, links, a máquina de estados `ComposeFlow`. 26 testes. |
-| `app/` | O plugin do Nexus (SDK `sdk-v0.23.0`, capacidades `surfaces,stt,tts`), o leitor de notificações, o ajudante de envio, os ajustes. |
-| `upstream/` | O patch proposto ao Relay do Anezium ("falar a conversa ao abrir"). |
-
-Compilar: `./gradlew :core:testDebugUnitTest :app:assembleDebug` (JDK 17, Android SDK 36).
-
-**A conferir no aparelho:** se o id do atalho de conversa do WhatsApp é o id do WhatsApp (`…@s.whatsapp.net`); os ids `com.whatsapp:id/entry` e `:id/send`; se o hub do Nexus concede `stt`/`tts` a um plugin instalado fora da loja.
+Apache-2.0 · Marcus de Magalhães ([alema.io](https://alema.io)). Built on the Rokid Nexus plugin SDK by Anezium. Not affiliated with WhatsApp, Meta or Rokid.

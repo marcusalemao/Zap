@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter
 /**
  * Turns the current [Step] of [ComposeFlow] into the [Screen] every host draws.
  *
- * HUD rules from the VisualContext design: green on black only, no gesture
+ * HUD rules of the alema line: green on black only, no gesture
  * hints (the wearer knows the native gestures), short lines. Widths are the
  * ones Relay measured on the Rokid optics.
  *

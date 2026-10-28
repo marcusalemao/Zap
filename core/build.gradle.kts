@@ -1,5 +1,5 @@
 // Pure Kotlin on purpose: no android.* imports live here, so the same rules can
-// later run in VisualContext, a standalone glasses app, or a server.
+// later run in a standalone glasses app or on a server.
 plugins {
     id("com.android.library")
 }
