@@ -338,14 +338,17 @@ class ZapSendService : AccessibilityService() {
 
     /**
      * A caption box found only by being editable counts only on a screen that also
-     * shows the media itself (a WhatsApp view whose id names a photo, image, video or
-     * preview). Without it the screen could be any other WhatsApp form, and the
+     * shows the media itself: a WhatsApp thumbnail or player view whose id names a
+     * photo, image, video or preview. Without it the screen could be any other WhatsApp form, and the
      * wearer's thumb finishes the send instead (Anezium's review of RokidBrew #120).
      */
     private fun hasMediaPreview(root: AccessibilityNodeInfo, pkg: String): Boolean =
         walk(root).any { node ->
             val id = node.viewIdResourceName ?: return@any false
-            id.startsWith("$pkg:id/") && MEDIA_PREVIEW_HINTS.any { id.substringAfter(":id/").contains(it, ignoreCase = true) }
+            val kind = node.className?.toString().orEmpty()
+            id.startsWith("$pkg:id/") &&
+                MEDIA_PREVIEW_HINTS.any { id.substringAfter(":id/").contains(it, ignoreCase = true) } &&
+                MEDIA_VIEW_KINDS.any { kind.contains(it, ignoreCase = true) }
         }
 
     private fun walk(root: AccessibilityNodeInfo): List<AccessibilityNodeInfo> {
@@ -399,6 +402,8 @@ class ZapSendService : AccessibilityService() {
         private val CAPTION_IDS = listOf("caption", "media_caption", "caption_text")
         /** Words in the ids of WhatsApp's media preview views (photo, image, video, preview). */
         private val MEDIA_PREVIEW_HINTS = listOf("photo", "image", "video", "preview", "media_view")
+        /** The view kinds that draw the media itself: a thumbnail or a player, not a button or a text. */
+        private val MEDIA_VIEW_KINDS = listOf("ImageView", "PhotoView", "VideoView", "TextureView", "SurfaceView", "ViewPager")
 
         @Volatile
         private var instance: ZapSendService? = null
