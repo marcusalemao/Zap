@@ -392,9 +392,9 @@ class ZapSettingsActivity : Activity() {
         if (last == now) return
         prefs.edit().putString("version", now).apply()
         if (last == null) return
-        val news = if (now == "0.15.1" && last.startsWith("0.15")) t(
-            "\n\nNovidades:\n• O botão Zap no Painel rápido agora mostra \"Ligado\" ou \"Pausado\" (o texto antigo era cortado no Samsung).\n• O código do Zap mudou de casa: github.com/marcusalemao/zap.",
-            "\n\nWhat's new:\n• The Zap button in Quick Settings now reads \"On\" or \"Paused\" (the old text was cut off on Samsung).\n• Zap's code has a home of its own: github.com/marcusalemao/zap.",
+        val news = if (now != "0.15.0" && now.startsWith("0.15") && last.startsWith("0.15")) t(
+            "\n\nNovidades:\n• O botão Zap no Painel rápido agora mostra \"Ligado\" ou \"Pausado\" (o texto antigo era cortado no Samsung).\n• Envio de foto mais seguro: o ajudante só aperta Enviar quando vê a prévia da foto na tela.\n• O código do Zap mudou de casa: github.com/marcusalemao/zap.",
+            "\n\nWhat's new:\n• The Zap button in Quick Settings now reads \"On\" or \"Paused\" (the old text was cut off on Samsung).\n• Safer photo sending: the helper only presses Send when it sees the photo preview on screen.\n• Zap's code has a home of its own: github.com/marcusalemao/zap.",
         ) else if (now.startsWith("0.15")) t(
             "\n\nNovidades:\n• Resumo do dia: na tela inicial do Zap nos óculos, \"✦ Resumo do dia\" lê as conversas de hoje e mostra o que importa, conversa por conversa.\n• Ações da IA no resumo: abrir endereço no Google Maps, guardar endereço, lembrete de tarefa (\"levar o contrato sexta\"), além de agenda e respostas prontas.\n• \"Enviar foto com o celular bloqueado\" explicado passo a passo, com o nome atual do Android (Desbloqueio estendido).\n• Avisos de segurança e de apps de banco em destaque.",
             "\n\nWhat's new:\n• The day's summary: on Zap's home on the glasses, \"✦ The day's summary\" reads today's chats and shows what matters, chat by chat.\n• AI actions in the summary: open an address in Google Maps, save an address, a reminder for something to do, plus calendar and ready replies.\n• \"Send photos with the phone locked\" step by step, with Android's current name (Extend Unlock).\n• Security and banking-app notes set apart.",

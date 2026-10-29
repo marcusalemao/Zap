@@ -239,7 +239,7 @@ class ZapSendService : AccessibilityService() {
         if (root.findAccessibilityNodeInfosByViewId("${armed.pkg}:id/entry").isNotEmpty()) return false
         val caption = CAPTION_IDS.firstNotNullOfOrNull { id ->
             root.findAccessibilityNodeInfosByViewId("${armed.pkg}:id/$id").firstOrNull()
-        } ?: editables(root).firstOrNull { node ->
+        } ?: editables(root).takeIf { hasMediaPreview(root, armed.pkg) }?.firstOrNull { node ->
             val shown = node.text?.toString()?.trim().orEmpty()
             if (armed.text.isBlank()) shown.isEmpty() || node.isShowingHintText else shown == armed.text.trim()
         } ?: return false
@@ -336,6 +336,18 @@ class ZapSendService : AccessibilityService() {
 
     private fun editables(root: AccessibilityNodeInfo) = walk(root).filter { it.isEditable }
 
+    /**
+     * A caption box found only by being editable counts only on a screen that also
+     * shows the media itself (a WhatsApp view whose id names a photo, image, video or
+     * preview). Without it the screen could be any other WhatsApp form, and the
+     * wearer's thumb finishes the send instead (Anezium's review of RokidBrew #120).
+     */
+    private fun hasMediaPreview(root: AccessibilityNodeInfo, pkg: String): Boolean =
+        walk(root).any { node ->
+            val id = node.viewIdResourceName ?: return@any false
+            id.startsWith("$pkg:id/") && MEDIA_PREVIEW_HINTS.any { id.substringAfter(":id/").contains(it, ignoreCase = true) }
+        }
+
     private fun walk(root: AccessibilityNodeInfo): List<AccessibilityNodeInfo> {
         val out = ArrayList<AccessibilityNodeInfo>()
         val queue = ArrayDeque<AccessibilityNodeInfo>().apply { add(root) }
@@ -385,6 +397,8 @@ class ZapSendService : AccessibilityService() {
         private val SEND_IDS = listOf("send", "send_media_btn", "send_button", "sendButton", "media_send_button")
         /** Caption box ids WhatsApp has used on its photo preview. */
         private val CAPTION_IDS = listOf("caption", "media_caption", "caption_text")
+        /** Words in the ids of WhatsApp's media preview views (photo, image, video, preview). */
+        private val MEDIA_PREVIEW_HINTS = listOf("photo", "image", "video", "preview", "media_view")
 
         @Volatile
         private var instance: ZapSendService? = null
