@@ -777,8 +777,7 @@ class ZapSettingsActivity : Activity() {
                             row.forEach { reaction ->
                                 val on = reaction.emoji in chosen
                                 val label = io.alema.zap.core.Reactions.withTone(reaction, tone).emoji
-                                val button = if (on) NexusUi.pillButton(this@ZapSettingsActivity, label) else NexusUi.outlinePillButton(this@ZapSettingsActivity, label)
-                                button.isAllCaps = false
+                                val button = choicePill(label, selected = on)
                                 button.textSize = 20f
                                 button.contentDescription = reaction.word
                                 button.setOnClickListener {
@@ -955,6 +954,25 @@ class ZapSettingsActivity : Activity() {
     }
 
     /** A row of choices; the current one is the filled pill, like Nexus's own speed picker. */
+    /**
+     * One geometry for a row of choices, selected or not: the SDK's filled and
+     * outlined pills differ in padding, tracking and height, so swapping them
+     * made the chosen option taller and wider than its neighbours and wrapped
+     * its label. Only the colours change here.
+     */
+    private fun choicePill(label: String, selected: Boolean): android.widget.Button =
+        NexusUi.outlinePillButton(this, label).apply {
+            setAllCaps(false)
+            text = label
+            letterSpacing = 0.06f
+            setSingleLine(true)
+            ellipsize = null
+            setPadding(NexusUi.dp(this@ZapSettingsActivity, 8), 0, NexusUi.dp(this@ZapSettingsActivity, 8), 0)
+            minHeight = NexusUi.dp(this@ZapSettingsActivity, 48)
+            minimumHeight = NexusUi.dp(this@ZapSettingsActivity, 48)
+            if (selected) NexusUi.stylePillAsPrimary(this@ZapSettingsActivity, this)
+        }
+
     private fun choiceCard(
         title: String,
         subtitle: String,
@@ -975,11 +993,7 @@ class ZapSettingsActivity : Activity() {
                         options.forEach { value ->
                             // Same case on both pill styles (the outline one capitalises by itself).
                             val text = label(value).uppercase()
-                            val button = if (value == current) {
-                                NexusUi.pillButton(this@ZapSettingsActivity, text)
-                            } else {
-                                NexusUi.outlinePillButton(this@ZapSettingsActivity, text)
-                            }
+                            val button = choicePill(text, selected = value == current)
                             button.setOnClickListener {
                                 onPick(value)
                                 render()
