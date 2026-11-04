@@ -153,12 +153,20 @@ class ZapSettingsActivity : Activity() {
                 "Zap stops pressing Send by itself: the chat opens on the phone with the text ready and you tap Send. To turn it back on, Android asks you to go through the Accessibility screen.",
             ),
             onDisable = { if (!ZapSendService.pause()) startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) },
+            example = Example(
+                t("Acessibilidade: ligue só a chave de cima", "Accessibility: turn on only the top switch"),
+                listOf("acess-samsung" to t("Samsung (One UI)", "Samsung (One UI)"), "acess-android" to t("Outros Android (ilustração)", "Other Android phones (illustration)")),
+            ),
         )
         warningCard(
             t("Apps de banco", "Banking apps"),
             t(
                 "Alguns apps de banco não abrem, ou mostram um alerta de risco, quando a Acessibilidade de outro app está ligada. Antes de abrir o banco, pause o Zap pelo atalho \"Zap\" no Painel rápido (deslize a tela de cima para baixo) e religue depois.",
                 "Some banking apps won't open, or show a risk warning, while another app's Accessibility is on. Before opening your bank, pause Zap with the \"Zap\" tile in Quick Settings (swipe down from the top) and turn it back on later.",
+            ),
+            example = Example(
+                t("O botão Zap no Painel rápido", "The Zap tile in Quick Settings"),
+                listOf("painel-samsung" to t("Samsung (One UI): azul = ligado", "Samsung (One UI): blue = on"), "painel-android" to t("Outros Android (ilustração)", "Other Android phones (illustration)")),
             ),
         )
         val background = ZapSender.canStartFromBackground(this)
@@ -461,8 +469,8 @@ class ZapSettingsActivity : Activity() {
         switchCard(
             title = t("Resumos e ações com IA", "AI summaries and actions"),
             subtitle = t(
-                "Ao abrir nos óculos uma conversa com 3 ou mais mensagens novas (ou 2 áudios seguidos), aparece o resumo e o que fazer: responder com um toque, pôr na agenda, criar um lembrete, abrir ou guardar um endereço. Na tela inicial, \"✦ Resumo do dia\" resume as conversas de hoje. Só o que você abre vai para a IA que você escolher, com a sua chave. Desligado, o Zap não usa a internet.",
-                "When you open a chat on the glasses with 3+ new messages (or 2 voice notes in a row), you get the summary and what to do: a one-tap reply, add to calendar, a reminder, open or save an address. On home, \"✦ The day's summary\" sums up today's chats. Only what you open goes to the AI you choose, with your key. Off, Zap doesn't use the internet.",
+                "Ao abrir nos óculos uma conversa com 3 ou mais mensagens novas (ou 2 áudios seguidos), aparece o resumo e o que fazer: responder com um toque, pôr na agenda, criar um lembrete, abrir ou guardar um endereço. Na tela inicial, \"✦ Resumo do dia\" resume as conversas de hoje. Só o que você abre vai para a IA que você escolher, com a sua chave. Sem chave, o Zap não usa a internet; esta chave geral desliga tudo de uma vez.",
+                "When you open a chat on the glasses with 3+ new messages (or 2 voice notes in a row), you get the summary and what to do: a one-tap reply, add to calendar, a reminder, open or save an address. On home, \"✦ The day's summary\" sums up today's chats. Only what you open goes to the AI you choose, with your key. Without a key, Zap doesn't use the internet; this main switch turns it all off at once.",
             ),
             checked = on,
         ) { value ->
@@ -685,6 +693,12 @@ class ZapSettingsActivity : Activity() {
                         ),
                     ),
                 )
+                exampleButton(
+                    Example(
+                        t("Desbloqueio Compartilhado: só Dispositivos de confiança", "Shared Unlock: only Trusted devices"),
+                        listOf("desbloqueio-samsung" to t("Samsung (One UI)", "Samsung (One UI)")),
+                    ),
+                )
                 addView(BusTheme.gap(this@ZapSettingsActivity, 10))
                 val samsung = android.os.Build.MANUFACTURER.equals("samsung", ignoreCase = true)
                 // Samsung first on a Samsung, the generic one first elsewhere.
@@ -820,6 +834,50 @@ class ZapSettingsActivity : Activity() {
         ) { settings.setSkinTone(tones[it]) }
     }
 
+    // --- "Ver exemplo": pictures of the Android screens ------------------------
+
+    /** A titled set of screenshots shipped in assets/help, one per phone family. */
+    class Example(val title: String, val shots: List<Pair<String, String>>)
+
+    private fun LinearLayout.exampleButton(example: Example) {
+        addView(BusTheme.gap(this@ZapSettingsActivity, 6))
+        addView(
+            NexusUi.textButton(this@ZapSettingsActivity, t("Ver exemplo", "See example")).apply {
+                setOnClickListener { showExample(example) }
+            },
+        )
+    }
+
+    /** The pictures, marked where to tap, in the phone's language; Fechar at the end. */
+    private fun showExample(example: Example) {
+        val lang = if (Locale.getDefault().language == "pt") "pt" else "en"
+        val column = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            val pad = NexusUi.dp(this@ZapSettingsActivity, 20)
+            setPadding(pad, NexusUi.dp(this@ZapSettingsActivity, 8), pad, 0)
+            example.shots.forEach { (name, caption) ->
+                val bitmap = runCatching { assets.open("help/$name-$lang.jpg").use { android.graphics.BitmapFactory.decodeStream(it) } }.getOrNull() ?: return@forEach
+                addView(NexusUi.rowSub(this@ZapSettingsActivity, caption))
+                addView(BusTheme.gap(this@ZapSettingsActivity, 6))
+                addView(
+                    android.widget.ImageView(this@ZapSettingsActivity).apply {
+                        setImageBitmap(bitmap)
+                        adjustViewBounds = true
+                        scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
+                        contentDescription = caption
+                    },
+                    LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT),
+                )
+                addView(BusTheme.gap(this@ZapSettingsActivity, 16))
+            }
+        }
+        android.app.AlertDialog.Builder(this)
+            .setTitle(example.title)
+            .setView(android.widget.ScrollView(this).apply { addView(column) })
+            .setPositiveButton(t("Fechar", "Close"), null)
+            .show()
+    }
+
     // --- cards in the Nexus style ------------------------------------------
 
     private fun section(label: String) {
@@ -831,12 +889,13 @@ class ZapSettingsActivity : Activity() {
     private fun gap(dp: Int) = content.addView(BusTheme.gap(this, dp))
 
     /** A risk the wearer should know about, set apart from the rest, never hidden in a paragraph. */
-    private fun warningCard(title: String, body: String) {
+    private fun warningCard(title: String, body: String, example: Example? = null) {
         content.addView(
             NexusUi.card(this).apply {
                 addView(NexusUi.cardTitle(this@ZapSettingsActivity, "⚠ $title"))
                 addView(BusTheme.gap(this@ZapSettingsActivity, 5))
                 addView(NexusUi.cardBody(this@ZapSettingsActivity, body))
+                if (example != null) exampleButton(example)
             },
             NexusUi.block(),
         )
@@ -919,12 +978,15 @@ class ZapSettingsActivity : Activity() {
         loses: String? = null,
         /** Turns it off when Zap can; otherwise the Android screen opens. */
         onDisable: (() -> Unit)? = null,
+        /** Pictures of the Android screen, opened by "Ver exemplo". */
+        example: Example? = null,
     ) {
         content.addView(
             NexusUi.card(this).apply {
                 addView(NexusUi.cardTitle(this@ZapSettingsActivity, (if (granted) "✓ " else "") + title))
                 addView(BusTheme.gap(this@ZapSettingsActivity, 5))
                 addView(NexusUi.cardBody(this@ZapSettingsActivity, if (granted) why else "$why\n\n$how"))
+                if (example != null) exampleButton(example)
                 if (!granted) {
                     addView(BusTheme.gap(this@ZapSettingsActivity, 10))
                     addView(
