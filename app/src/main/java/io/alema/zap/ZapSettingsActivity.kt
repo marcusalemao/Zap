@@ -1,16 +1,3 @@
-                val samsung = android.os.Build.MANUFACTURER.equals("samsung", ignoreCase = true)
-                // Samsung first on a Samsung, the generic one first elsewhere.
-                val buttons = listOf(
-                    t("Buscar \"Desbloqueio extra\" (Samsung)", "Search \"Extend Unlock\" (Samsung)") to { searchSettingsFor(t("Desbloqueio extra", "Extend Unlock")) },
-                    t("Dispositivos de confiança (Android)", "Trusted devices (Android)") to { openExtendUnlock() },
-                ).let { if (samsung) it else it.reversed() }
-                buttons.forEach { (label, open) ->
-                    addView(
-                        NexusUi.outlinePillButton(this@ZapSettingsActivity, label).apply { setOnClickListener { open() } },
-                        LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT),
-                    )
-                    addView(BusTheme.gap(this@ZapSettingsActivity, 8))
-                }
 package io.alema.zap
 
 import android.Manifest
@@ -738,7 +725,7 @@ class ZapSettingsActivity : Activity() {
                 val samsung = android.os.Build.MANUFACTURER.equals("samsung", ignoreCase = true)
                 // Samsung first on a Samsung, the generic one first elsewhere.
                 val buttons = listOf(
-                    t("Tela de bloqueio (Samsung)", "Lock screen (Samsung)") to { openSamsungExtraUnlock() },
+                    t("Buscar \"Desbloqueio extra\" (Samsung)", "Search \"Extend Unlock\" (Samsung)") to { searchSettingsFor(t("Desbloqueio extra", "Extend Unlock")) },
                     t("Dispositivos de confiança (Android)", "Trusted devices (Android)") to { openExtendUnlock() },
                 ).let { if (samsung) it else it.reversed() }
                 buttons.forEach { (label, open) ->
