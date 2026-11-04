@@ -252,6 +252,7 @@ class ZapSettingsActivity : Activity() {
         placesSection()
         reactionsSection()
         unlockSection()
+        feedbackSection()
 
         section(t("Avisos nos óculos", "Notices on the glasses"))
         choiceCard(
@@ -393,8 +394,8 @@ class ZapSettingsActivity : Activity() {
         prefs.edit().putString("version", now).apply()
         if (last == null) return
         val news = if (now != "0.15.0" && now.startsWith("0.15") && last.startsWith("0.15")) t(
-            "\n\nNovidades:\n• O botão Zap no Painel rápido agora mostra \"Ligado\" ou \"Pausado\" (o texto antigo era cortado no Samsung).\n• Envio de foto mais seguro: o ajudante só aperta Enviar quando vê a prévia da foto na tela.\n• O código do Zap mudou de casa: github.com/marcusalemao/zap.",
-            "\n\nWhat's new:\n• The Zap button in Quick Settings now reads \"On\" or \"Paused\" (the old text was cut off on Samsung).\n• Safer photo sending: the helper only presses Send when it sees the photo preview on screen.\n• Zap's code has a home of its own: github.com/marcusalemao/zap.",
+            "\n\nNovidades:\n• Pronto para o Rokid Nexus 2.0 (SDK 0.24).\n• Feedback e apoio: um campo aqui embaixo manda sua opinião para zap@alema.io, e o botão do Ko-fi ajuda a manter o Zap.",
+            "\n\nWhat's new:\n• Ready for Rokid Nexus 2.0 (SDK 0.24).\n• Feedback and support: a field below sends your thoughts to zap@alema.io, and the Ko-fi button helps keep Zap going.",
         ) else if (now.startsWith("0.15")) t(
             "\n\nNovidades:\n• Resumo do dia: na tela inicial do Zap nos óculos, \"✦ Resumo do dia\" lê as conversas de hoje e mostra o que importa, conversa por conversa.\n• Ações da IA no resumo: abrir endereço no Google Maps, guardar endereço, lembrete de tarefa (\"levar o contrato sexta\"), além de agenda e respostas prontas.\n• \"Enviar foto com o celular bloqueado\" explicado passo a passo, com o nome atual do Android (Desbloqueio estendido).\n• Avisos de segurança e de apps de banco em destaque.",
             "\n\nWhat's new:\n• The day's summary: on Zap's home on the glasses, \"✦ The day's summary\" reads today's chats and shows what matters, chat by chat.\n• AI actions in the summary: open an address in Google Maps, save an address, a reminder for something to do, plus calendar and ready replies.\n• \"Send photos with the phone locked\" step by step, with Android's current name (Extend Unlock).\n• Security and banking-app notes set apart.",
@@ -575,6 +576,73 @@ class ZapSettingsActivity : Activity() {
                 }
                 addView(BusTheme.gap(this@ZapSettingsActivity, 6))
                 addView(NexusUi.rowSub(this@ZapSettingsActivity, t("Modelo: ${ZapAi.model(this@ZapSettingsActivity)}", "Model: ${ZapAi.model(this@ZapSettingsActivity)}")))
+            },
+            NexusUi.block(),
+        )
+        gap(8)
+    }
+
+    // --- feedback and support (0.15.3) ------------------------------------------
+
+    /**
+     * Zap has no server, so feedback leaves through the phone's own mail app: a
+     * draft to zap@alema.io with the text typed here plus the versions that help
+     * reproduce it. Nothing is sent until the person taps Send in the mail app.
+     */
+    private fun feedbackSection() {
+        section(t("Feedback e apoio", "Feedback and support"))
+        val field = NexusUi.field(this, t("O que funcionou, o que faltou, o que quebrou…", "What worked, what's missing, what broke…")).apply {
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE or android.text.InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+            minLines = 3
+            isSingleLine = false
+        }
+        content.addView(
+            NexusUi.card(this).apply {
+                addView(NexusUi.cardTitle(this@ZapSettingsActivity, t("Me conta como foi", "Tell me how it went")))
+                addView(BusTheme.gap(this@ZapSettingsActivity, 5))
+                addView(
+                    NexusUi.cardBody(
+                        this@ZapSettingsActivity,
+                        t(
+                            "O Zap não tem servidor, então o feedback vai pelo seu app de e-mail, para zap@alema.io, junto com a versão do Zap, do Nexus e o modelo do celular. Nada sai sem você tocar em Enviar lá.",
+                            "Zap has no server, so feedback goes through your mail app, to zap@alema.io, along with the Zap and Nexus versions and the phone model. Nothing leaves until you tap Send there.",
+                        ),
+                    ),
+                )
+                addView(BusTheme.gap(this@ZapSettingsActivity, 10))
+                addView(field, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+                addView(BusTheme.gap(this@ZapSettingsActivity, 10))
+                addView(
+                    NexusUi.pillButton(this@ZapSettingsActivity, t("ENVIAR POR E-MAIL", "SEND BY E-MAIL")).apply {
+                        setOnClickListener {
+                            val typed = field.text?.toString().orEmpty().trim()
+                            val hub = runCatching { packageManager.getPackageInfo("com.anezium.rokidbus.phone", 0).versionName }.getOrNull() ?: "?"
+                            val body = typed + "\n\n--\nZap ${BuildConfig.VERSION_NAME} · Rokid Nexus $hub · ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL} · Android ${android.os.Build.VERSION.RELEASE}"
+                            val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:zap@alema.io")).apply {
+                                putExtra(Intent.EXTRA_SUBJECT, "Feedback do Zap ${BuildConfig.VERSION_NAME}")
+                                putExtra(Intent.EXTRA_TEXT, body)
+                            }
+                            runCatching { startActivity(intent) }.onFailure {
+                                android.widget.Toast.makeText(this@ZapSettingsActivity, t("Nenhum app de e-mail. Escreva para zap@alema.io", "No mail app. Write to zap@alema.io"), android.widget.Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    },
+                )
+                addView(BusTheme.gap(this@ZapSettingsActivity, 12))
+                addView(NexusUi.rowTitle(this@ZapSettingsActivity, t("O Zap é grátis e de código aberto", "Zap is free and open source")))
+                addView(BusTheme.gap(this@ZapSettingsActivity, 4))
+                addView(
+                    NexusUi.rowSub(
+                        this@ZapSettingsActivity,
+                        t("Se ele te poupa de tirar o celular do bolso, um café ajuda a manter o projeto.", "If it saves you from taking your phone out, a coffee helps keep the project going."),
+                    ),
+                )
+                addView(BusTheme.gap(this@ZapSettingsActivity, 8))
+                addView(
+                    NexusUi.outlinePillButton(this@ZapSettingsActivity, t("APOIAR NO KO-FI", "SUPPORT ON KO-FI")).apply {
+                        setOnClickListener { runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ko-fi.com/alemaio"))) } }
+                    },
+                )
             },
             NexusUi.block(),
         )
