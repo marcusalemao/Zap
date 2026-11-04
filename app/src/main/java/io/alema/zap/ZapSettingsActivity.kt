@@ -641,8 +641,11 @@ class ZapSettingsActivity : Activity() {
                             val typed = field.text?.toString().orEmpty().trim()
                             val hub = runCatching { packageManager.getPackageInfo("com.anezium.rokidbus.phone", 0).versionName }.getOrNull() ?: "?"
                             val body = typed + "\n\n--\nZap ${BuildConfig.VERSION_NAME} · Rokid Nexus $hub · ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL} · Android ${android.os.Build.VERSION.RELEASE}"
-                            val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:zap@alema.io")).apply {
-                                putExtra(Intent.EXTRA_SUBJECT, "Feedback do Zap ${BuildConfig.VERSION_NAME}")
+                            // Gmail ignores the extras on a bare mailto: subject and body go in the address itself.
+                            val subject = "Feedback do Zap ${BuildConfig.VERSION_NAME}"
+                            val mailto = "mailto:zap@alema.io?subject=${Uri.encode(subject)}&body=${Uri.encode(body)}"
+                            val intent = Intent(Intent.ACTION_SENDTO, Uri.parse(mailto)).apply {
+                                putExtra(Intent.EXTRA_SUBJECT, subject)
                                 putExtra(Intent.EXTRA_TEXT, body)
                             }
                             runCatching { startActivity(intent) }.onFailure {
