@@ -693,7 +693,7 @@ class ZapSettingsActivity : Activity() {
                                 "Para enviar foto sem pegar o celular, deixe os óculos Rokid como dispositivo de confiança: o celular fica destravado só enquanto estiver conectado a eles por Bluetooth, e trava assim que se afastam.\n" +
                                 "No Android isso se chama Desbloqueio extra (em inglês, Extend Unlock; em celulares antigos, Smart Lock).\n" +
                                 "Samsung: toque em \"Buscar Desbloqueio extra\". A busca dos Ajustes abre já com o termo (se vier vazia, cole: ele está copiado). Toque no resultado, digite o PIN, toque em Entendi e chegue em Dispositivos de confiança.\n" +
-                                "Outros Android (Motorola e afins): toque em \"Dispositivos de confiança (Android)\". O caminho é Segurança e privacidade › Mais segurança e privacidade › Desbloqueio extra › Dispositivos de confiança.\n" +
+                                "Outros Android (Motorola e afins): toque em \"Abrir Desbloqueio extra (Android)\". O caminho é Segurança e privacidade › Mais segurança e privacidade › Desbloqueio extra › Dispositivos de confiança.\n" +
                                 
                                 "Em Dispositivos de confiança, toque em Adicionar e escolha os óculos Rokid.\n\n" +
                                 "Use só \"Dispositivos de confiança\". Não ligue \"Detecção no bolso\" nem \"Lugares de confiança\": com elas o celular sai do bolso já destravado, e num roubo isso é tudo que o ladrão precisa.\n\n" +
@@ -702,7 +702,7 @@ class ZapSettingsActivity : Activity() {
                                 "To send photos without picking up the phone, make the Rokid glasses a trusted device: the phone stays unlocked only while connected to them over Bluetooth, and locks as soon as they move away.\n" +
                                 "Android calls this Extend Unlock (Smart Lock on older phones).\n" +
                                 "Samsung: tap \"Search Extend Unlock\". Settings search opens with the term (if it comes up empty, paste it: it's copied). Tap the result, enter your PIN, tap Got it and land on Trusted devices.\n" +
-                                "Other Android phones (Motorola and the like): tap \"Trusted devices (Android)\". The path is Security and privacy › More security and privacy › Extend Unlock › Trusted devices.\n" +
+                                "Other Android phones (Motorola and the like): tap \"Open Extend Unlock (Android)\". The path is Security and privacy › More security and privacy › Extend Unlock › Trusted devices.\n" +
                                 
                                 "In Trusted devices, tap Add and pick the Rokid glasses.\n\n" +
                                 "Use only \"Trusted devices\". Don't turn on \"On-body detection\" or \"Trusted places\": with those the phone leaves your pocket already unlocked, and in a robbery that's all a thief needs.\n\n" +
@@ -726,7 +726,7 @@ class ZapSettingsActivity : Activity() {
                 // Samsung first on a Samsung, the generic one first elsewhere.
                 val buttons = listOf(
                     t("Buscar \"Desbloqueio extra\" (Samsung)", "Search \"Extend Unlock\" (Samsung)") to { searchSettingsFor(t("Desbloqueio extra", "Extend Unlock")) },
-                    t("Dispositivos de confiança (Android)", "Trusted devices (Android)") to { openExtendUnlock() },
+                    t("Abrir Desbloqueio extra (Android)", "Open Extend Unlock (Android)") to { openExtendUnlock() },
                 ).let { if (samsung) it else it.reversed() }
                 buttons.forEach { (label, open) ->
                     addView(
