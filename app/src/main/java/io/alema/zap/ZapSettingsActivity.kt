@@ -258,15 +258,15 @@ class ZapSettingsActivity : Activity() {
         choiceCard(
             title = t("Quando chegar mensagem", "When a message arrives"),
             subtitle = t(
-                "Aviso: quem escreveu e o começo, por 4 segundos. Com voz: a mensagem inteira, lida em voz alta na hora — nos óculos ou fones, nunca no alto-falante do celular. Se o Relay também avisa o WhatsApp, desligue um dos dois.",
-                "Notice: who wrote and the start, for 4 seconds. With voice: the whole message, read aloud at once — on the glasses or earbuds, never the phone's speaker. If Relay also shows WhatsApp, turn one of them off.",
+                "Aviso: quem escreveu e o começo, por 4 segundos. Voz: a mensagem inteira, lida em voz alta na hora — nos óculos ou fones, nunca no alto-falante do celular. Se o Relay também avisa o WhatsApp, desligue um dos dois.",
+                "Notice: who wrote and the start, for 4 seconds. Voice: the whole message, read aloud at once — on the glasses or earbuds, never the phone's speaker. If Relay also shows WhatsApp, turn one of them off.",
             ),
             options = listOf(ZapSettings.ARRIVAL_OFF, ZapSettings.ARRIVAL_NOTICE, ZapSettings.ARRIVAL_READ),
             label = {
                 when (it) {
                     ZapSettings.ARRIVAL_OFF -> t("Nada", "Nothing")
                     ZapSettings.ARRIVAL_NOTICE -> t("Aviso", "Notice")
-                    else -> t("Com voz", "With voice")
+                    else -> t("Voz", "Voice")
                 }
             },
             current = settings.arrivalMode(),
