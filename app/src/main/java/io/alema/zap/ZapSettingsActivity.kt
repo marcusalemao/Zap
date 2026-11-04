@@ -742,8 +742,8 @@ class ZapSettingsActivity : Activity() {
         warningCard(
             t("Atenção à segurança", "Security note"),
             t(
-                "Com os óculos conectados por perto, o celular fica desbloqueado: quem pegar o seu celular entra sem senha. Desligue o dispositivo confiável quando não precisar.",
-                "While the glasses are connected nearby, the phone stays unlocked: anyone holding it gets in without a PIN. Turn the trusted device off when you don't need it.",
+                "Enquanto os óculos estiverem conectados por perto, o celular fica destravado: quem pegar o seu celular entra sem senha. Para travar de novo na hora, basta tirar os óculos do alcance: dobre as hastes (eles desligam o Bluetooth em poucos minutos) ou desligue o Bluetooth do celular. Não precisa mexer no Desbloqueio extra.",
+                "While the glasses are connected nearby, the phone stays unlocked: anyone holding it gets in without a PIN. To lock it again right away, just take the glasses out of range: fold the temples (they switch Bluetooth off within minutes) or turn off the phone's Bluetooth. No need to touch Extend Unlock.",
             ),
         )
         ZapSendTrace.describe(this, pt)?.let { infoCard(t("Último envio pelo Zap", "Last send through Zap"), it) }
