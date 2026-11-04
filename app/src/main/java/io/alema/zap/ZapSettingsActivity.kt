@@ -668,29 +668,37 @@ class ZapSettingsActivity : Activity() {
                         t(
                             "Texto já vai com o celular bloqueado. Foto precisa abrir o WhatsApp, e o Android não deixa abrir por cima da tela de bloqueio.\n\n" +
                                 "Para enviar foto sem pegar o celular, deixe os óculos Rokid como dispositivo de confiança: o celular fica destravado só enquanto estiver conectado a eles por Bluetooth, e trava assim que se afastam.\n" +
-                                "1. Toque em \"Abrir dispositivos confiáveis\".\n" +
-                                "2. Se não abrir a tela certa, toque em \"Buscar nos Ajustes\" e digite Desbloqueio. O nome muda por celular: Samsung chama de Desbloqueio Compartilhado (em Tela de bloqueio e AOD); celulares com Android puro (Motorola, Pixel e outros), Desbloqueio estendido; alguns ainda, Smart Lock.\n" +
-                                "3. Entre em Dispositivos de confiança, toque em Adicionar e escolha os óculos Rokid.\n\n" +
+                                "Samsung: toque em \"Desbloqueio extra (Samsung)\". O caminho é Tela de bloqueio e AOD › Desbloqueio extra › Desbloqueio Compartilhado › Dispositivos de confiança.\n" +
+                                "Outros Android (Motorola e afins): toque em \"Dispositivos de confiança (Android)\". O nome lá é Desbloqueio estendido; em alguns celulares, ainda Smart Lock.\n" +
+                                "Se nenhum botão abrir a tela certa, toque em \"Buscar nos Ajustes\" e digite Desbloqueio.\n" +
+                                "Em Dispositivos de confiança, toque em Adicionar e escolha os óculos Rokid.\n\n" +
                                 "Use só \"Dispositivos de confiança\". Não ligue \"Detecção no bolso\" nem \"Lugares de confiança\": com elas o celular sai do bolso já destravado, e num roubo isso é tudo que o ladrão precisa.\n\n" +
                                 "Se o seu celular não tiver essa opção, tudo bem: o Zap avisa nos óculos quando for preciso desbloquear.",
                             "Text already goes with the phone locked. A photo has to open WhatsApp, and Android won't open it over the lock screen.\n\n" +
                                 "To send photos without picking up the phone, make the Rokid glasses a trusted device: the phone stays unlocked only while connected to them over Bluetooth, and locks as soon as they move away.\n" +
-                                "1. Tap \"Open trusted devices\".\n" +
-                                "2. If the right screen doesn't open, tap \"Search Settings\" and type Unlock. The name varies: Samsung calls it Shared Unlock (under Lock screen and AOD); phones with stock Android (Motorola, Pixel and others), Extend Unlock; some still, Smart Lock.\n" +
-                                "3. Go to Trusted devices, tap Add and pick the Rokid glasses.\n\n" +
+                                "Samsung: tap \"Extra unlock (Samsung)\". The path is Lock screen and AOD › Extra unlock › Shared Unlock › Trusted devices.\n" +
+                                "Other Android phones (Motorola and the like): tap \"Trusted devices (Android)\". There it's called Extend Unlock; on some phones, still Smart Lock.\n" +
+                                "If neither button opens the right screen, tap \"Search Settings\" and type Unlock.\n" +
+                                "In Trusted devices, tap Add and pick the Rokid glasses.\n\n" +
                                 "Use only \"Trusted devices\". Don't turn on \"On-body detection\" or \"Trusted places\": with those the phone leaves your pocket already unlocked, and in a robbery that's all a thief needs.\n\n" +
                                 "If your phone doesn't have it, that's fine: Zap tells you on the glasses when the phone needs unlocking.",
                         ),
                     ),
                 )
                 addView(BusTheme.gap(this@ZapSettingsActivity, 10))
-                addView(
-                    NexusUi.outlinePillButton(this@ZapSettingsActivity, t("Abrir dispositivos confiáveis", "Open trusted devices")).apply {
-                        setOnClickListener { openExtendUnlock() }
-                    },
-                    LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT),
-                )
-                addView(BusTheme.gap(this@ZapSettingsActivity, 8))
+                val samsung = android.os.Build.MANUFACTURER.equals("samsung", ignoreCase = true)
+                // Samsung first on a Samsung, the generic one first elsewhere.
+                val buttons = listOf(
+                    t("Desbloqueio extra (Samsung)", "Extra unlock (Samsung)") to { openSamsungExtraUnlock() },
+                    t("Dispositivos de confiança (Android)", "Trusted devices (Android)") to { openExtendUnlock() },
+                ).let { if (samsung) it else it.reversed() }
+                buttons.forEach { (label, open) ->
+                    addView(
+                        NexusUi.outlinePillButton(this@ZapSettingsActivity, label).apply { setOnClickListener { open() } },
+                        LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT),
+                    )
+                    addView(BusTheme.gap(this@ZapSettingsActivity, 8))
+                }
                 addView(
                     NexusUi.outlinePillButton(this@ZapSettingsActivity, t("Buscar nos Ajustes", "Search Settings")).apply {
                         setOnClickListener {
@@ -840,16 +848,34 @@ class ZapSettingsActivity : Activity() {
      * no public shortcut; its screen is tried first, then the phone's Security screen,
      * then Settings. Each step that Android refuses falls through to the next.
      */
+    /** Stock Android: Google's trust agent screen ("Extend Unlock", once "Smart Lock"). */
     private fun openExtendUnlock() {
-        val attempts = listOf(
-            // Samsung (One UI): "Desbloqueio Compartilhado" lives in Samsung's own settings, not in Google's trust agent.
-            Intent().setClassName("com.android.settings", "com.android.settings.Settings\$SmartLockActivity"),
+        openFirst(
             Intent().setClassName("com.google.android.gms", "com.google.android.gms.trustagent.GoogleTrustAgentPersonalUnlockingSettings"),
             Intent(Settings.ACTION_SECURITY_SETTINGS),
             Intent(Settings.ACTION_SETTINGS),
         )
+    }
+
+    /**
+     * Samsung (One UI): Tela de bloqueio e AOD › Desbloqueio extra › Desbloqueio Compartilhado.
+     * Samsung's lock-screen screen is reachable; "Desbloqueio extra" is two taps from there.
+     */
+    private fun openSamsungExtraUnlock() {
+        openFirst(
+            Intent().setClassName("com.android.settings", "com.android.settings.Settings\$LockscreenDashboardActivity"),
+            Intent().setClassName("com.android.settings", "com.android.settings.Settings\$LockScreenSettingsActivity"),
+            Intent().setClassName("com.android.settings", "com.samsung.android.settings.lockscreen.LockScreenSettings"),
+            Intent(Settings.ACTION_SECURITY_SETTINGS),
+            Intent(Settings.ACTION_SETTINGS),
+        )
+    }
+
+    /** Only intents that resolve count: an explicit class that does not exist throws, and we move on. */
+    private fun openFirst(vararg attempts: Intent) {
         for (intent in attempts) {
-            if (runCatching { startActivity(intent) }.isSuccess) return
+            val resolves = intent.component == null || intent.resolveActivity(packageManager) != null
+            if (resolves && runCatching { startActivity(intent) }.isSuccess) return
         }
     }
 

@@ -30,6 +30,9 @@
         <package android:name="com.whatsapp" />
         <package android:name="com.whatsapp.w4b" />
         <package android:name="com.anezium.rokidbus.phone" />
+        <!-- So the settings shortcuts can check which lock-screen screen exists before opening it. -->
+        <package android:name="com.android.settings" />
+        <package android:name="com.google.android.gms" />
     </queries>
 
     <application
