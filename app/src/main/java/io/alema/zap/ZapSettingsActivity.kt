@@ -388,6 +388,20 @@ class ZapSettingsActivity : Activity() {
             ),
         )
         gap(24)
+        unclip(content)
+    }
+
+    /**
+     * The Nexus row subtitles cut to one line with an ellipsis, which hides the half of the
+     * sentence that explains the setting. Zap lets every explanation wrap.
+     */
+    private fun unclip(view: android.view.View) {
+        if (view is android.widget.TextView && view !is android.widget.Button && view.ellipsize == android.text.TextUtils.TruncateAt.END) {
+            view.maxLines = Int.MAX_VALUE
+            view.ellipsize = null
+            view.isSingleLine = false
+        }
+        if (view is ViewGroup) for (i in 0 until view.childCount) unclip(view.getChildAt(i))
     }
 
     /**
@@ -1061,6 +1075,7 @@ class ZapSettingsActivity : Activity() {
             setSingleLine(true)
             ellipsize = null
             setPadding(NexusUi.dp(this@ZapSettingsActivity, 8), 0, NexusUi.dp(this@ZapSettingsActivity, 8), 0)
+            setAutoSizeTextTypeUniformWithConfiguration(9, 12, 1, android.util.TypedValue.COMPLEX_UNIT_SP)
             minHeight = NexusUi.dp(this@ZapSettingsActivity, 48)
             minimumHeight = NexusUi.dp(this@ZapSettingsActivity, 48)
             if (selected) NexusUi.stylePillAsPrimary(this@ZapSettingsActivity, this)
