@@ -668,14 +668,14 @@ class ZapSettingsActivity : Activity() {
                         t(
                             "Texto já vai com o celular bloqueado. Foto precisa abrir o WhatsApp, e o Android não deixa abrir por cima da tela de bloqueio.\n\n" +
                                 "Para enviar foto sem pegar o celular, deixe os óculos como dispositivo confiável:\n" +
-                                "1. Toque em \"Abrir o Desbloqueio estendido\".\n" +
-                                "2. Se não abrir, toque em \"Buscar nos Ajustes\" e digite Desbloqueio. Em alguns celulares o nome ainda é Smart Lock.\n" +
-                                "3. Entre em Dispositivos confiáveis, toque em Adicionar e escolha os óculos Rokid.\n\n" +
+                                "1. Toque em \"Abrir dispositivos confiáveis\".\n" +
+                                "2. Se não abrir a tela certa, toque em \"Buscar nos Ajustes\" e digite Desbloqueio. O nome muda por celular: Samsung chama de Desbloqueio Compartilhado (em Tela de bloqueio e AOD); Pixel e outros, Desbloqueio estendido; alguns ainda, Smart Lock.\n" +
+                                "3. Entre em Dispositivos de confiança, toque em Adicionar e escolha os óculos Rokid.\n\n" +
                                 "Se o seu celular não tiver essa opção, tudo bem: o Zap avisa nos óculos quando for preciso desbloquear.",
                             "Text already goes with the phone locked. A photo has to open WhatsApp, and Android won't open it over the lock screen.\n\n" +
                                 "To send photos without picking up the phone, make the glasses a trusted device:\n" +
-                                "1. Tap \"Open Extend Unlock\".\n" +
-                                "2. If it doesn't open, tap \"Search Settings\" and type Extend Unlock. Some phones still call it Smart Lock.\n" +
+                                "1. Tap \"Open trusted devices\".\n" +
+                                "2. If the right screen doesn't open, tap \"Search Settings\" and type Unlock. The name varies: Samsung calls it Shared Unlock (under Lock screen and AOD); Pixel and others, Extend Unlock; some still, Smart Lock.\n" +
                                 "3. Go to Trusted devices, tap Add and pick the Rokid glasses.\n\n" +
                                 "If your phone doesn't have it, that's fine: Zap tells you on the glasses when the phone needs unlocking.",
                         ),
@@ -683,7 +683,7 @@ class ZapSettingsActivity : Activity() {
                 )
                 addView(BusTheme.gap(this@ZapSettingsActivity, 10))
                 addView(
-                    NexusUi.outlinePillButton(this@ZapSettingsActivity, t("Abrir o Desbloqueio estendido", "Open Extend Unlock")).apply {
+                    NexusUi.outlinePillButton(this@ZapSettingsActivity, t("Abrir dispositivos confiáveis", "Open trusted devices")).apply {
                         setOnClickListener { openExtendUnlock() }
                     },
                     LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT),
@@ -840,6 +840,8 @@ class ZapSettingsActivity : Activity() {
      */
     private fun openExtendUnlock() {
         val attempts = listOf(
+            // Samsung (One UI): "Desbloqueio Compartilhado" lives in Samsung's own settings, not in Google's trust agent.
+            Intent().setClassName("com.android.settings", "com.android.settings.Settings\$SmartLockActivity"),
             Intent().setClassName("com.google.android.gms", "com.google.android.gms.trustagent.GoogleTrustAgentPersonalUnlockingSettings"),
             Intent(Settings.ACTION_SECURITY_SETTINGS),
             Intent(Settings.ACTION_SETTINGS),
