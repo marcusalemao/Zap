@@ -531,11 +531,12 @@ class ZapSettingsActivity : Activity() {
     /** The key: masked when saved, a field to paste a new one, Test and Delete. Where to get a free one, for Gemini. */
     private fun keyCard(provider: ZapAi.Provider) {
         val masked = ZapAi.maskedKey(this)
-        val field = NexusUi.field(this, t("Cole a chave aqui", "Paste the key here")).apply {
+        // With a key saved, the field shows it masked (AIza…k3Q9) and asks for a new one only if you type.
+        val field = NexusUi.field(this, masked?.let { t("Chave salva: $it · cole outra para trocar", "Saved key: $it · paste another to replace") } ?: t("Cole a chave aqui", "Paste the key here")).apply {
             inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
             imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_DONE
         }
-        val status = NexusUi.rowSub(this, masked?.let { t("Chave salva: $it", "Saved key: $it") } ?: t("Nenhuma chave ainda", "No key yet"))
+        val status = NexusUi.rowSub(this, if (masked != null) t("✓ Chave salva", "✓ Key saved") else t("Nenhuma chave ainda", "No key yet"))
         content.addView(
             NexusUi.card(this).apply {
                 addView(NexusUi.rowTitle(this@ZapSettingsActivity, t("Chave de IA · ${provider.label}", "AI key · ${provider.label}")))
@@ -551,7 +552,8 @@ class ZapSettingsActivity : Activity() {
                             choicePill(label, selected = primary).apply { setOnClickListener { onClick() } },
                             LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = NexusUi.dp(this@ZapSettingsActivity, 6) },
                         )
-                        pill(t("SALVAR", "SAVE"), primary = true) {
+                        // "Salvar" only while there is something new to save; with a key in place the row reads Salvo.
+                        pill(if (masked != null) t("SALVO", "SAVED") else t("SALVAR", "SAVE"), primary = masked == null) {
                             val typed = field.text?.toString().orEmpty()
                             if (typed.isNotBlank()) ZapAi.setKey(this@ZapSettingsActivity, typed)
                             render()
