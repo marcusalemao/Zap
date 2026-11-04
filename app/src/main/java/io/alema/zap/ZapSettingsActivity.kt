@@ -926,6 +926,7 @@ class ZapSettingsActivity : Activity() {
     private fun openExtendUnlock() {
         openFirst(
             Intent().setClassName("com.google.android.gms", "com.google.android.gms.trustagent.GoogleTrustAgentPersonalUnlockingSettings"),
+            Intent().setClassName("com.google.android.gms", "com.google.android.gms.trustagent.GoogleTrustAgentSettings"),
             Intent(Settings.ACTION_SECURITY_SETTINGS),
             Intent(Settings.ACTION_SETTINGS),
         )
@@ -937,6 +938,8 @@ class ZapSettingsActivity : Activity() {
      */
     private fun openSamsungExtraUnlock() {
         openFirst(
+            // "Desbloqueio extra" lists the trust agents (Desbloqueio Compartilhado among them): AOSP's trust-agent page, kept by One UI.
+            Intent().setClassName("com.android.settings", "com.android.settings.Settings\$TrustAgentSettingsActivity"),
             Intent().setClassName("com.android.settings", "com.android.settings.Settings\$LockscreenDashboardActivity"),
             Intent().setClassName("com.android.settings", "com.android.settings.Settings\$LockScreenSettingsActivity"),
             Intent().setClassName("com.android.settings", "com.samsung.android.settings.lockscreen.LockScreenSettings"),
