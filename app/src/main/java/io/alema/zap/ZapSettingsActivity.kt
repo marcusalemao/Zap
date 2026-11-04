@@ -1,3 +1,16 @@
+                val samsung = android.os.Build.MANUFACTURER.equals("samsung", ignoreCase = true)
+                // Samsung first on a Samsung, the generic one first elsewhere.
+                val buttons = listOf(
+                    t("Buscar \"Desbloqueio extra\" (Samsung)", "Search \"Extend Unlock\" (Samsung)") to { searchSettingsFor(t("Desbloqueio extra", "Extend Unlock")) },
+                    t("Dispositivos de confiança (Android)", "Trusted devices (Android)") to { openExtendUnlock() },
+                ).let { if (samsung) it else it.reversed() }
+                buttons.forEach { (label, open) ->
+                    addView(
+                        NexusUi.outlinePillButton(this@ZapSettingsActivity, label).apply { setOnClickListener { open() } },
+                        LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT),
+                    )
+                    addView(BusTheme.gap(this@ZapSettingsActivity, 8))
+                }
 package io.alema.zap
 
 import android.Manifest
@@ -691,17 +704,19 @@ class ZapSettingsActivity : Activity() {
                         t(
                             "Texto já vai com o celular bloqueado. Foto precisa abrir o WhatsApp, e o Android não deixa abrir por cima da tela de bloqueio.\n\n" +
                                 "Para enviar foto sem pegar o celular, deixe os óculos Rokid como dispositivo de confiança: o celular fica destravado só enquanto estiver conectado a eles por Bluetooth, e trava assim que se afastam.\n" +
-                                "Samsung: toque em \"Desbloqueio extra (Samsung)\". O caminho é Tela de bloqueio e AOD › Desbloqueio extra › Desbloqueio Compartilhado › Dispositivos de confiança.\n" +
-                                "Outros Android (Motorola e afins): toque em \"Dispositivos de confiança (Android)\". O nome lá é Desbloqueio estendido; em alguns celulares, ainda Smart Lock.\n" +
-                                "Se nenhum botão abrir a tela certa, toque em \"Buscar nos Ajustes\" e digite Desbloqueio.\n" +
+                                "No Android isso se chama Desbloqueio extra (em inglês, Extend Unlock; em celulares antigos, Smart Lock).\n" +
+                                "Samsung: toque em \"Buscar Desbloqueio extra\". A busca dos Ajustes abre já com o termo (se vier vazia, cole: ele está copiado). Toque no resultado, digite o PIN, toque em Entendi e chegue em Dispositivos de confiança.\n" +
+                                "Outros Android (Motorola e afins): toque em \"Dispositivos de confiança (Android)\". O caminho é Segurança e privacidade › Mais segurança e privacidade › Desbloqueio extra › Dispositivos de confiança.\n" +
+                                
                                 "Em Dispositivos de confiança, toque em Adicionar e escolha os óculos Rokid.\n\n" +
                                 "Use só \"Dispositivos de confiança\". Não ligue \"Detecção no bolso\" nem \"Lugares de confiança\": com elas o celular sai do bolso já destravado, e num roubo isso é tudo que o ladrão precisa.\n\n" +
                                 "Se o seu celular não tiver essa opção, tudo bem: o Zap avisa nos óculos quando for preciso desbloquear.",
                             "Text already goes with the phone locked. A photo has to open WhatsApp, and Android won't open it over the lock screen.\n\n" +
                                 "To send photos without picking up the phone, make the Rokid glasses a trusted device: the phone stays unlocked only while connected to them over Bluetooth, and locks as soon as they move away.\n" +
-                                "Samsung: tap \"Extra unlock (Samsung)\". The path is Lock screen and AOD › Extra unlock › Shared Unlock › Trusted devices.\n" +
-                                "Other Android phones (Motorola and the like): tap \"Trusted devices (Android)\". There it's called Extend Unlock; on some phones, still Smart Lock.\n" +
-                                "If neither button opens the right screen, tap \"Search Settings\" and type Unlock.\n" +
+                                "Android calls this Extend Unlock (Smart Lock on older phones).\n" +
+                                "Samsung: tap \"Search Extend Unlock\". Settings search opens with the term (if it comes up empty, paste it: it's copied). Tap the result, enter your PIN, tap Got it and land on Trusted devices.\n" +
+                                "Other Android phones (Motorola and the like): tap \"Trusted devices (Android)\". The path is Security and privacy › More security and privacy › Extend Unlock › Trusted devices.\n" +
+                                
                                 "In Trusted devices, tap Add and pick the Rokid glasses.\n\n" +
                                 "Use only \"Trusted devices\". Don't turn on \"On-body detection\" or \"Trusted places\": with those the phone leaves your pocket already unlocked, and in a robbery that's all a thief needs.\n\n" +
                                 "If your phone doesn't have it, that's fine: Zap tells you on the glasses when the phone needs unlocking.",
@@ -710,15 +725,20 @@ class ZapSettingsActivity : Activity() {
                 )
                 exampleButton(
                     Example(
-                        t("Desbloqueio Compartilhado: só Dispositivos de confiança", "Shared Unlock: only Trusted devices"),
-                        listOf("desbloqueio-samsung" to t("Samsung (One UI)", "Samsung (One UI)")),
+                        t("Samsung: o caminho até Dispositivos de confiança", "Samsung: the way to Trusted devices"),
+                        listOf(
+                            "desbloq-1" to t("1. Nos Ajustes: Tela de bloqueio e AOD (ou busque \"Desbloqueio extra\")", "1. In Settings: Lock screen and AOD (or search \"Extend Unlock\")"),
+                            "desbloq-2" to t("2. Desbloqueio extra (o Android pede o PIN)", "2. Extend Unlock (Android asks for your PIN)"),
+                            "desbloq-3" to t("3. Toque em Entendi", "3. Tap Got it"),
+                            "desbloqueio-samsung" to t("4. Só Dispositivos de confiança; deixe as outras duas desligadas", "4. Only Trusted devices; leave the other two off"),
+                        ),
                     ),
                 )
                 addView(BusTheme.gap(this@ZapSettingsActivity, 10))
                 val samsung = android.os.Build.MANUFACTURER.equals("samsung", ignoreCase = true)
                 // Samsung first on a Samsung, the generic one first elsewhere.
                 val buttons = listOf(
-                    t("Desbloqueio extra (Samsung)", "Extra unlock (Samsung)") to { openSamsungExtraUnlock() },
+                    t("Tela de bloqueio (Samsung)", "Lock screen (Samsung)") to { openSamsungExtraUnlock() },
                     t("Dispositivos de confiança (Android)", "Trusted devices (Android)") to { openExtendUnlock() },
                 ).let { if (samsung) it else it.reversed() }
                 buttons.forEach { (label, open) ->
@@ -728,15 +748,6 @@ class ZapSettingsActivity : Activity() {
                     )
                     addView(BusTheme.gap(this@ZapSettingsActivity, 8))
                 }
-                addView(
-                    NexusUi.outlinePillButton(this@ZapSettingsActivity, t("Buscar nos Ajustes", "Search Settings")).apply {
-                        setOnClickListener {
-                            runCatching { startActivity(Intent(Settings.ACTION_APP_SEARCH_SETTINGS)) }
-                                .onFailure { runCatching { startActivity(Intent(Settings.ACTION_SETTINGS)) } }
-                        }
-                    },
-                    LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT),
-                )
             },
             NexusUi.block(),
         )
@@ -937,15 +948,33 @@ class ZapSettingsActivity : Activity() {
      * Samsung's lock-screen screen is reachable; "Desbloqueio extra" is two taps from there.
      */
     private fun openSamsungExtraUnlock() {
+        // One UI has no shortcut into "Desbloqueio extra" itself; its parent screen is the closest that opens reliably.
         openFirst(
-            // "Desbloqueio extra" lists the trust agents (Desbloqueio Compartilhado among them): AOSP's trust-agent page, kept by One UI.
-            Intent().setClassName("com.android.settings", "com.android.settings.Settings\$TrustAgentSettingsActivity"),
             Intent().setClassName("com.android.settings", "com.android.settings.Settings\$LockscreenDashboardActivity"),
             Intent().setClassName("com.android.settings", "com.android.settings.Settings\$LockScreenSettingsActivity"),
             Intent().setClassName("com.android.settings", "com.samsung.android.settings.lockscreen.LockScreenSettings"),
             Intent(Settings.ACTION_SECURITY_SETTINGS),
             Intent(Settings.ACTION_SETTINGS),
         )
+    }
+
+    /**
+     * Settings search, with the term pre-filled where the search screen accepts a query
+     * (AOSP and One UI read "query") and on the clipboard for the ones that don't.
+     */
+    private fun searchSettingsFor(term: String) {
+        runCatching {
+            val clip = getSystemService(android.content.ClipboardManager::class.java)
+            clip.setPrimaryClip(android.content.ClipData.newPlainText("Zap", term))
+        }
+        val search = Intent(Settings.ACTION_APP_SEARCH_SETTINGS)
+            .putExtra("query", term)
+            .putExtra("android.provider.extra.QUERY", term)
+            .putExtra(android.app.SearchManager.QUERY, term)
+        if (runCatching { startActivity(search) }.isFailure) {
+            runCatching { startActivity(Intent(Settings.ACTION_SETTINGS)) }
+        }
+        android.widget.Toast.makeText(this, t("\"$term\" copiado: cole na busca se vier vazia", "\"$term\" copied: paste it if the search is empty"), android.widget.Toast.LENGTH_LONG).show()
     }
 
     /** Only intents that resolve count: an explicit class that does not exist throws, and we move on. */
