@@ -548,8 +548,7 @@ class ZapSettingsActivity : Activity() {
                     LinearLayout(this@ZapSettingsActivity).apply {
                         orientation = LinearLayout.HORIZONTAL
                         fun pill(label: String, primary: Boolean, onClick: () -> Unit) = addView(
-                            (if (primary) NexusUi.pillButton(this@ZapSettingsActivity, label) else NexusUi.outlinePillButton(this@ZapSettingsActivity, label))
-                                .apply { setOnClickListener { onClick() } },
+                            choicePill(label, selected = primary).apply { setOnClickListener { onClick() } },
                             LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply { marginEnd = NexusUi.dp(this@ZapSettingsActivity, 6) },
                         )
                         pill(t("SALVAR", "SAVE"), primary = true) {
