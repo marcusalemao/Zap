@@ -260,7 +260,6 @@ class ZapSettingsActivity : Activity() {
         placesSection()
         reactionsSection()
         unlockSection()
-        feedbackSection()
 
         section(t("Avisos nos óculos", "Notices on the glasses"))
         choiceCard(
@@ -387,6 +386,7 @@ class ZapSettingsActivity : Activity() {
                 "Zap listens and reads aloud with what you chose in Nexus. To change it, go to Nexus settings: Speech (understanding you) and Voice (reading aloud).",
             ),
         )
+        feedbackSection()
         gap(24)
         unclip(content)
     }
