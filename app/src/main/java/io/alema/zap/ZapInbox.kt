@@ -107,6 +107,8 @@ internal object ZapInbox {
             fresh = incoming.messages
                 .filter { it.sender != ME && it.timeMs > before && System.currentTimeMillis() - it.timeMs < FRESH_MS }
                 .maxByOrNull { it.timeMs }
+            // Bridge to VisualContext: count the new one-to-one messages (both ways), never their text.
+            ZapTalk.count(context, incoming, incoming.messages.count { it.timeMs > before })
             val merged = InboxRules.merge(chats[incoming.key], incoming)
             chats.remove(incoming.key)
             chats[incoming.key] = merged
@@ -174,6 +176,7 @@ internal object ZapInbox {
             synchronized(lock) {
                 chats[key]?.let { chat ->
                     chats[key] = InboxRules.merge(chat, chat.copy(messages = listOf(ZapMessage(ME, text, System.currentTimeMillis())))).seen()
+                    ZapTalk.count(context, chat, 1)
                 }
                 save(context)
             }
@@ -195,6 +198,7 @@ internal object ZapInbox {
             val chat = chats[key] ?: title?.let { ZapConversation(key, it, digits, isGroup = false, messages = emptyList()) } ?: return
             chats[key] = InboxRules.merge(chat, chat.copy(messages = listOf(ZapMessage(ME, text, System.currentTimeMillis())))).seen()
             save(context)
+            ZapTalk.count(context, chat, 1)
         }
         notifyChanged()
     }

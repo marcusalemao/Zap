@@ -35,6 +35,12 @@
         <package android:name="com.google.android.gms" />
     </queries>
 
+    <!-- Lets VisualContext read the counts. "normal": the two apps are signed with different keys; the switch in Zap is the real lock. -->
+    <permission
+        android:name="io.alema.permission.FREQUENT_CONTACTS"
+        android:protectionLevel="normal"
+        android:label="Com quem você mais fala no WhatsApp (contagem)" />
+
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
@@ -47,6 +53,13 @@
         <activity
             android:name=".ZapSettingsActivity"
             android:exported="true" />
+
+        <!-- Bridge to VisualContext: who you talk to most, counts only (never messages); empty while the switch is off. -->
+        <provider
+            android:name=".ZapFrequentProvider"
+            android:authorities="io.alema.zap.frequent"
+            android:exported="true"
+            android:readPermission="io.alema.permission.FREQUENT_CONTACTS" />
 
         <!-- Hands WhatsApp the one photo being sent; never exported. -->
         <provider

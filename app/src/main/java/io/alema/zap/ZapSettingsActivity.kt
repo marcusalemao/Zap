@@ -377,6 +377,16 @@ class ZapSettingsActivity : Activity() {
             NexusUi.block(),
         )
 
+        section(t("VisualContext", "VisualContext"))
+        switchCard(
+            t("Compartilhar com quem você mais fala", "Share who you talk to most"),
+            t(
+                "O VisualContext usa isso para importar primeiro os rostos de quem importa para você. Vai só a contagem de mensagens por pessoa nos últimos 30 dias, nunca as mensagens. Grupos ficam de fora. Desligar apaga a contagem.",
+                "VisualContext uses it to import first the faces of the people who matter to you. Only the message count per person over 30 days goes, never the messages. Groups are left out. Turning it off deletes the count.",
+            ),
+            ZapTalk.enabled(this),
+        ) { on -> ZapTalk.setEnabled(this, on) }
+
         section(t("Voz", "Voice"))
         // No "open Nexus" button: Nexus does not expose its Speech/Voice screens to other apps.
         infoCard(
